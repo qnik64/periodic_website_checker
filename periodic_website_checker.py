@@ -3,7 +3,10 @@ from urllib.error import HTTPError, URLError
 import json
 import datetime
 
-WEEKS_TO_EXAMINE = 26
+import gmail_interface
+
+WEEKS_TO_EXAMINE = 27
+SEND_TO = "piotr.hoffner.wroc@gmail.com"
 
 
 def get_json(url):
@@ -28,13 +31,22 @@ def gen_url(begin_date, end_date):
     return base_url + doctor_hash + response_type + given_dates
 
 
+def send_email_for_dates(start_date, end_date, found_days):
+    subject = "found : " + str(len(found_days)) + " slots between " + str(start_date) + " and " + str(end_date)
+    print(subject)
+    body = ''
+    for day in found_days:
+        body += str(day)
+        body += '\n'
+    gmail_interface.send_email(SEND_TO, subject, body)
+
+
 def examine_one_week(start_date):
     end_date = start_date + datetime.timedelta(days=6)
     response = get_json(gen_url(start_date, end_date))
     dates = json.loads(response['days'])
-    print("found : ", len(dates), " slots between ", start_date, " and ", end_date)
-    for day in dates:
-        print(day)
+    if len(dates):
+        send_email_for_dates(start_date, end_date, dates)
 
 
 today = datetime.date.today()
