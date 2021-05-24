@@ -5,6 +5,7 @@ import datetime
 import cache
 import gmail_interface
 import web_grabber
+from updater import git_update
 from script_logger import script_log
 from timer import RaiTimer, get_date_and_time
 
@@ -61,6 +62,7 @@ def get_new_dates_for_whole_period():
 
 def periodic_website_checker():
     timer = RaiTimer()
+    git_update()
     script_log("started at: " + get_date_and_time())
     get_new_dates_for_whole_period()
 
