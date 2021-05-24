@@ -1,5 +1,6 @@
 import json
 import datetime
+import urllib
 
 
 import cache
@@ -11,9 +12,9 @@ from script_logger import script_log
 from timer import RaiTimer, get_date_and_time
 
 
-WEEKS_TO_EXAMINE = 30
+WEEKS_TO_EXAMINE = 35
 SEND_TO = "piotr.hoffner.wroc@gmail.com"
-LINK_TO_HUMAN_READABLE_WEB = "https://zarejestrowani.pl/w/7i5rOptkNVwJagUP0-PNmcWm-NnFOx0T8vUUHpm3jvvLYbICLoj7if6bHnnn7ffyDRUt3a1zmw_povdsdy2CjA"
+LINK_TO_HUMAN_READABLE_WEB = "https://zarejestrowani.pl/w/7i5rOptkNVwJagUP0-PNmcWm-NnFOx0T8vUUHpm3jvvLYbICLoj7if6bHnnn7ffyDRUt3a1zmw%5Fpovdsdy2CjA"
 
 
 def gen_url(begin_date, end_date):
@@ -25,14 +26,18 @@ def gen_url(begin_date, end_date):
 
 
 def send_nofifications_for_dates(found_days):
-    subject = "found : " + str(len(found_days)) + " new slots!"
+    subject = "[zarejestrowani alert] found : " + str(len(found_days)) + " new slots!"
     script_log(subject)
     script_log(', '.join(found_days))
-    body = '\n'.join(found_days)
-    body += "\nPlease check immediately the website: " + LINK_TO_HUMAN_READABLE_WEB
+    found_dates = '\n'.join(found_days)
+    action = "\nPlease check immediately the website: " \
+
+    body = found_dates + action + LINK_TO_HUMAN_READABLE_WEB
     gmail_interface.send_email(SEND_TO, subject, body)
+
     telegram_interface.send_telegram(subject)
-    telegram_interface.send_telegram(body)
+    telegram_interface.send_telegram(found_dates)
+    telegram_interface.send_telegram(action + urllib.parse.quote(LINK_TO_HUMAN_READABLE_WEB))
 
 
 def examine_one_week(start_date):
