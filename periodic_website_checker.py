@@ -8,6 +8,7 @@ import gmail_interface
 
 WEEKS_TO_EXAMINE = 30
 SEND_TO = "piotr.hoffner.wroc@gmail.com"
+LINK_TO_HUMAN_READABLE_WEB = "https://zarejestrowani.pl/w/7i5rOptkNVwJagUP0-PNmcWm-NnFOx0T8vUUHpm3jvvLYbICLoj7if6bHnnn7ffyDRUt3a1zmw_povdsdy2CjA"
 
 
 def get_json(url):
@@ -39,6 +40,7 @@ def send_email_for_dates(found_days):
     for day in found_days:
         body += str(day)
         body += '\n'
+    body += "Please check immediately the website: " + LINK_TO_HUMAN_READABLE_WEB
     gmail_interface.send_email(SEND_TO, subject, body)
 
 
