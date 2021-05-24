@@ -6,24 +6,11 @@ import datetime
 import cache
 import rai_timer
 import gmail_interface
+import web_grabber
 
 WEEKS_TO_EXAMINE = 30
 SEND_TO = "piotr.hoffner.wroc@gmail.com"
 LINK_TO_HUMAN_READABLE_WEB = "https://zarejestrowani.pl/w/7i5rOptkNVwJagUP0-PNmcWm-NnFOx0T8vUUHpm3jvvLYbICLoj7if6bHnnn7ffyDRUt3a1zmw_povdsdy2CjA"
-
-
-def get_json(url):
-    try:
-        url_response = urlopen(url).read()
-        return json.loads(url_response)
-    except HTTPError as e:
-        if 404 == e.code:
-            print(" NOT FOUND: ", url)
-        print("An HTTP error occurred on ", url, " error type: ", e)
-        return None
-    except URLError as e:
-        print("An URL error occurred on ", url, " error type: ", e)
-        return None
 
 
 def gen_url(begin_date, end_date):
@@ -47,7 +34,8 @@ def send_email_for_dates(found_days):
 
 def examine_one_week(start_date):
     end_date = start_date + datetime.timedelta(days=6)
-    response = get_json(gen_url(start_date, end_date))
+    url = gen_url(start_date, end_date)
+    response = json.loads(web_grabber.get_site(url))
     return json.loads(response['days'])
 
 
