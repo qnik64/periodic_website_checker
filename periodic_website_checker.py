@@ -1,16 +1,21 @@
-from urllib.request import urlopen
-from urllib.error import HTTPError, URLError
 import json
 import datetime
+import time
 
 import cache
-import rai_timer
 import gmail_interface
 import web_grabber
 
 WEEKS_TO_EXAMINE = 30
 SEND_TO = "piotr.hoffner.wroc@gmail.com"
 LINK_TO_HUMAN_READABLE_WEB = "https://zarejestrowani.pl/w/7i5rOptkNVwJagUP0-PNmcWm-NnFOx0T8vUUHpm3jvvLYbICLoj7if6bHnnn7ffyDRUt3a1zmw_povdsdy2CjA"
+LOG_FILENAME = "activity_log.txt"
+
+
+def script_log(message):
+    with open(LOG_FILENAME, 'at', newline='\n') as f:
+        f.write(message)
+        f.write("\n")
 
 
 def gen_url(begin_date, end_date):
@@ -23,12 +28,10 @@ def gen_url(begin_date, end_date):
 
 def send_email_for_dates(found_days):
     subject = "found : " + str(len(found_days)) + " new slots!"
-    print(subject)
-    body = ''
-    for day in found_days:
-        body += str(day)
-        body += '\n'
-    body += "Please check immediately the website: " + LINK_TO_HUMAN_READABLE_WEB
+    script_log(subject)
+    script_log(', '.join(found_days))
+    body = '\n'.join(found_days)
+    body += "\nPlease check immediately the website: " + LINK_TO_HUMAN_READABLE_WEB
     gmail_interface.send_email(SEND_TO, subject, body)
 
 
@@ -57,8 +60,10 @@ def get_new_dates_for_whole_period():
     new_dates = list_subs(available_dates, cached)
     if len(new_dates):
         send_email_for_dates(new_dates)
-        cache.append(new_dates)
+        cache.write(available_dates)
 
-timer = rai_timer.RaiTimer()
-print("script started at: ", datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
+start = time.time()
+script_log("script started at: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 get_new_dates_for_whole_period()
+script_log("script took: " + str(time.time() - start) + "s.")
