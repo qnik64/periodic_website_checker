@@ -2,10 +2,11 @@ from urllib.request import urlopen
 from urllib.error import HTTPError, URLError
 import json
 import datetime
+import cache
 
 import gmail_interface
 
-WEEKS_TO_EXAMINE = 27
+WEEKS_TO_EXAMINE = 30
 SEND_TO = "piotr.hoffner.wroc@gmail.com"
 
 
@@ -31,8 +32,8 @@ def gen_url(begin_date, end_date):
     return base_url + doctor_hash + response_type + given_dates
 
 
-def send_email_for_dates(start_date, end_date, found_days):
-    subject = "found : " + str(len(found_days)) + " slots between " + str(start_date) + " and " + str(end_date)
+def send_email_for_dates(found_days):
+    subject = "found : " + str(len(found_days)) + " new slots!"
     print(subject)
     body = ''
     for day in found_days:
@@ -44,11 +45,28 @@ def send_email_for_dates(start_date, end_date, found_days):
 def examine_one_week(start_date):
     end_date = start_date + datetime.timedelta(days=6)
     response = get_json(gen_url(start_date, end_date))
-    dates = json.loads(response['days'])
-    if len(dates):
-        send_email_for_dates(start_date, end_date, dates)
+    return json.loads(response['days'])
 
 
-today = datetime.date.today()
-for i in range(WEEKS_TO_EXAMINE):
-    examine_one_week(today + datetime.timedelta(days=i * 7))
+def get_dates_for_whole_period():
+    today = datetime.date.today()
+    dates = []
+    for i in range(WEEKS_TO_EXAMINE):
+        dates.extend(examine_one_week(today + datetime.timedelta(days=i * 7)))
+    return dates
+
+
+def list_subs(subtrahend, minuend):
+    return sorted([item for item in subtrahend if item not in minuend])
+
+
+def get_new_dates_for_whole_period():
+    cached = cache.read()
+    available_dates = get_dates_for_whole_period()
+    new_dates = list_subs(available_dates, cached)
+    if len(new_dates):
+        send_email_for_dates(new_dates)
+        cache.append(new_dates)
+
+
+get_new_dates_for_whole_period()
