@@ -9,7 +9,7 @@ def _filter_out_comments(input_list):
 
 def _gen_comment(list_content):
     length = str(len(list_content)).rjust(2)
-    time_stamp = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    time_stamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return "#new " + length + " entries found on: " + time_stamp + "\n"
 
 

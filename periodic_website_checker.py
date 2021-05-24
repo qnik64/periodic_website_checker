@@ -2,8 +2,9 @@ from urllib.request import urlopen
 from urllib.error import HTTPError, URLError
 import json
 import datetime
-import cache
 
+import cache
+import rai_timer
 import gmail_interface
 
 WEEKS_TO_EXAMINE = 30
@@ -70,5 +71,6 @@ def get_new_dates_for_whole_period():
         send_email_for_dates(new_dates)
         cache.append(new_dates)
 
-
+timer = rai_timer.RaiTimer()
+print("script started at: ", datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 get_new_dates_for_whole_period()
