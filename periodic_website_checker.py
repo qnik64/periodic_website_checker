@@ -4,6 +4,7 @@ import datetime
 
 import cache
 import gmail_interface
+import telegram_interface
 import web_grabber
 from updater import git_update
 from script_logger import script_log
@@ -23,13 +24,15 @@ def gen_url(begin_date, end_date):
     return base_url + doctor_hash + response_type + given_dates
 
 
-def send_email_for_dates(found_days):
+def send_nofifications_for_dates(found_days):
     subject = "found : " + str(len(found_days)) + " new slots!"
     script_log(subject)
     script_log(', '.join(found_days))
     body = '\n'.join(found_days)
     body += "\nPlease check immediately the website: " + LINK_TO_HUMAN_READABLE_WEB
     gmail_interface.send_email(SEND_TO, subject, body)
+    telegram_interface.send_telegram(subject)
+    telegram_interface.send_telegram(body)
 
 
 def examine_one_week(start_date):
@@ -56,7 +59,7 @@ def get_new_dates_for_whole_period():
     available_dates = get_dates_for_whole_period()
     new_dates = list_subs(available_dates, cached)
     if len(new_dates):
-        send_email_for_dates(new_dates)
+        send_nofifications_for_dates(new_dates)
         cache.write(available_dates)
 
 
