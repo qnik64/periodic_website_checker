@@ -1,21 +1,17 @@
 import json
 import datetime
-import time
+
 
 import cache
 import gmail_interface
 import web_grabber
+from script_logger import script_log
+from timer import RaiTimer, get_date_and_time
+
 
 WEEKS_TO_EXAMINE = 30
 SEND_TO = "piotr.hoffner.wroc@gmail.com"
 LINK_TO_HUMAN_READABLE_WEB = "https://zarejestrowani.pl/w/7i5rOptkNVwJagUP0-PNmcWm-NnFOx0T8vUUHpm3jvvLYbICLoj7if6bHnnn7ffyDRUt3a1zmw_povdsdy2CjA"
-LOG_FILENAME = "activity_log.txt"
-
-
-def script_log(message):
-    with open(LOG_FILENAME, 'at', newline='\n') as f:
-        f.write(message)
-        f.write("\n")
 
 
 def gen_url(begin_date, end_date):
@@ -63,7 +59,10 @@ def get_new_dates_for_whole_period():
         cache.write(available_dates)
 
 
-start = time.time()
-script_log("script started at: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-get_new_dates_for_whole_period()
-script_log("script took: " + str(time.time() - start) + "s.")
+def periodic_website_checker():
+    timer = RaiTimer()
+    script_log("started at: " + get_date_and_time())
+    get_new_dates_for_whole_period()
+
+
+periodic_website_checker()
