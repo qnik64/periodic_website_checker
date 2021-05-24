@@ -1,0 +1,4 @@
+BOT_TOKEN = ""
+CLIENT_CHAT_ID = ""
+ADMIN_CHAT_ID = ""
+
