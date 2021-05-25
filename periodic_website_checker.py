@@ -12,7 +12,7 @@ from script_logger import script_log
 from timer import RaiTimer, get_date_and_time
 
 
-WEEKS_TO_EXAMINE = 35
+WEEKS_TO_EXAMINE = 10
 SEND_TO = "piotr.hoffner.wroc@gmail.com"
 LINK_TO_HUMAN_READABLE_WEB = "https://zarejestrowani.pl/w/7i5rOptkNVwJagUP0-PNmcWm-NnFOx0T8vUUHpm3jvvLYbICLoj7if6bHnnn7ffyDRUt3a1zmw%5Fpovdsdy2CjA"
 
@@ -27,8 +27,7 @@ def gen_url(begin_date, end_date):
 
 def send_nofifications_for_dates(found_days):
     subject = "[zarejestrowani alert] found : " + str(len(found_days)) + " new slots!"
-    script_log(subject)
-    script_log(', '.join(found_days))
+    script_log(subject + " @ " + ', '.join(found_days))
     found_dates = '\n'.join(found_days)
     action = "\nPlease check immediately the website: " \
 
@@ -62,6 +61,7 @@ def list_subs(subtrahend, minuend):
 def get_new_dates_for_whole_period():
     cached = cache.read()
     available_dates = get_dates_for_whole_period()
+    script_log(str(len(available_dates)) + " slots foud " + ', '.join(available_dates))
     new_dates = list_subs(available_dates, cached)
     if len(new_dates):
         send_nofifications_for_dates(new_dates)
