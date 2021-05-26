@@ -77,9 +77,10 @@ def get_new_dates_for_whole_period():
     available_dates = get_dates_for_whole_period()
     script_log(str(len(available_dates)) + " slots foud " + ', '.join(available_dates))
     new_dates = list_subs(available_dates, cached)
+    cache.write(available_dates)
     if len(new_dates):
         send_nofifications_for_dates(new_dates)
-        cache.write(available_dates)
+
 
 
 def periodic_website_checker():
