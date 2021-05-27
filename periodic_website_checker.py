@@ -16,10 +16,10 @@ SEND_TO = "piotr.hoffner.wroc@gmail.com"
 LINK_TO_HUMAN_READABLE_WEB = "https://zarejestrowani.pl/w/7i5rOptkNVwJagUP0-PNmcWm-NnFOx0T8vUUHpm3jvvLYbICLoj7if6bHnnn7ffyDRUt3a1zmw%5Fpovdsdy2CjA"
 
 
-def gen_url(begin_date, end_date, type):
+def gen_url(begin_date, end_date, resp_type):
     base_url = "https://zarejestrowani.pl:8000/api/v1/public/timetable/"
     doctor_hash = "7i5rOptkNVwJagUP0-PNmcWm-NnFOx0T8vUUHpm3jvvLYbICLoj7if6bHnnn7ffyDRUt3a1zmw_povdsdy2CjA"
-    response_type = "/?type=" + str(type)
+    response_type = "/?type=" + str(resp_type)
     given_dates = "&from_date=" + str(begin_date) + "&to_date=" + str(end_date)
     return base_url + doctor_hash + response_type + given_dates
 
@@ -32,10 +32,7 @@ def send_nofifications_for_dates(found_days):
 
     body = found_dates + action + LINK_TO_HUMAN_READABLE_WEB
     gmail_interface.send_email(SEND_TO, subject, body)
-
-    telegram_interface.send_telegram(subject)
-    telegram_interface.send_telegram(found_dates)
-    telegram_interface.send_telegram(action + urllib.parse.quote(LINK_TO_HUMAN_READABLE_WEB))
+    telegram_interface.send_telegram(subject + "\n" + body)
 
 
 def get_hours(given_date):
@@ -75,12 +72,11 @@ def list_subs(subtrahend, minuend):
 def get_new_dates_for_whole_period():
     cached = cache.read()
     available_dates = get_dates_for_whole_period()
-    script_log(str(len(available_dates)) + " slots foud " + ', '.join(available_dates))
+    script_log(str(len(available_dates)) + " slots found " + ', '.join(available_dates))
     new_dates = list_subs(available_dates, cached)
     cache.write(available_dates)
     if len(new_dates):
         send_nofifications_for_dates(new_dates)
-
 
 
 def periodic_website_checker():

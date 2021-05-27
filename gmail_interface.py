@@ -5,6 +5,7 @@ from email.mime.multipart import MIMEMultipart
 
 
 from gmail_credentials import *
+from script_logger import script_log
 
 
 def send_email(receiver, subject, message):
@@ -20,4 +21,4 @@ def send_email(receiver, subject, message):
     with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
         server.login(GMAIL_ADDRESS, GMAIL_PASSWD)
         server.sendmail(GMAIL_ADDRESS, receiver, full_message.as_string())
-    print("e-mail sent")
+    script_log("e-mail sent")
